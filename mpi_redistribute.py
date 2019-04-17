@@ -1,5 +1,5 @@
 
-# from mpi4py import MPI
+from mpi4py import MPI
 import numpy as np
 
 def assign_id_to_rank(id_field, nproc, hash_function = hash):
@@ -18,6 +18,13 @@ def split_data_by_assigned_rank(data, assigned_rank, nproc):
 def redistribute_data_by_assigned_rank(data, assigned_rank, comm):
     nproc = comm.Get_size()
     split_data = split_data_assigned_rank(data, assigned_rank, comm)
+    redistrubted_data = np.concatenate(comm.alltoall(split_data))
+    return redistrubted_data
+
+def redistribute_data_by_id(data, id_field, comm):
+    nproc = comm.Get_size()
+    assigned_rank = assign_id_to_rank(id_field, nproc)
+    split_data = split_data_by_assigned_rank(data, assigned_rank, nproc)
     redistrubted_data = np.concatenate(comm.alltoall(split_data))
     return redistrubted_data
 
